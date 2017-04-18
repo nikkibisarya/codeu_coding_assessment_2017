@@ -15,40 +15,53 @@
 package com.google.codeu.codingchallenge;
 
 import java.util.Collection;
+import java.util.*;
 
 final class MyJSON implements JSON {
 
   @Override
   public JSON getObject(String name) {
     // TODO: implement this
-    return null;
+    return objDict.get(name);
   }
 
   @Override
   public JSON setObject(String name, JSON value) {
     // TODO: implement this
+    objDict.put(name, value);
     return this;
   }
 
   @Override
   public String getString(String name) {
     // TODO: implement this
-    return null;
+    return strDict.get(name);
   }
 
   @Override
   public JSON setString(String name, String value) {
     // TODO: implement this
+    strDict.put(name, value);
     return this;
   }
 
   @Override
   public void getObjects(Collection<String> names) {
     // TODO: implement this
+    for (String key : objDict.keySet()) {
+        names.add(key);
+    }
+    
   }
 
   @Override
   public void getStrings(Collection<String> names) {
     // TODO: implement this
+    for (String key : strDict.keySet()) {
+        names.add(key);
+    }
   }
+
+  Map<String, String> strDict = new HashMap<String, String>(); //make private?
+  Map<String, JSON> objDict = new HashMap<String, JSON>();
 }

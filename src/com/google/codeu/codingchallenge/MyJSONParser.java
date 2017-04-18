@@ -1,91 +1,166 @@
+// Copyright 2017 Google Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package com.google.codeu.codingchallenge;
 
 import java.io.IOException;
 
-final class MyJSONParser implements JSONParser {
-
-  @Override
-  public JSON parse(String in) throws IOException {
-  
-   String str = in;
-   if (str == null) {
-         return 0;
-     }
-
-   int length = str.length( );
-   char temp;
-   int count;
-   Map<String, String> strDict = new HashMap<String, String>();
-   Map<String, JSON> objDict = new HashMap<String, JSON>();
-
-   for(int i = 0; i < length; i + count)
-   {
-      count = 0;
-      temp = str.charAt( i );
-      String strValue = " ";
-      int nextCount;
-      char nxtTemp;
-      
-      while(temp != '{')
+final class MyJSONParser implements JSONParser
+{
+	private int valIndex = 0;
+	private MyJSON parseHelper(String in) throws IOException
+	{
+      if (in.length() == 0)
       {
-         count++;
-         if(temp != ' ')
-         {
-            throw exception;
-         }
+        	throw new IOException("Invalid string");
       }
-         nxtCount = i + count + 1;
-         nxtTemp = str.charAt( nxtCount );
-         while(nxtTemp != '"')
-         {
-            nxtCount++;
-            nxtTemp = str.charAt( i + nxtCount + 1 );
-            if(nxtTemp != ' ' | nxtTemp != '"')
-            {
-               throw exception;
-            }
-            else
-            {
-               while(++nxtCount != '"')
-               {
-                  strValue += str.charAt(nxtCount);           
-               }
-               nxtTemp = str.charAt( i + count + 1 );
-               if(nxtTemp != ":" | nxtTemp != " ")
-               {
-                  throw exception;
-               }
-               else
-               {
-                  while(++nxtCount != ':')
-                  {
-                     
-                  }
-               }
-              
-            }
-         }
-         
       
+		MyJSON store = new MyJSON();
+
+		valIndex = condenseWhiteSpace(in, valIndex);
+           
+   	if(in.charAt(valIndex) != '{')
+   	{
+   		throw new IOException("Next one is " + in.charAt(valIndex) + " not { at index " + valIndex);
+   	}
       
-   }
-            //make sure the first character is a quote
-            //collect string between first set of quotes
-            //if quote is escaped by a backslash, ignore the quote but include it in the string
-            //if there is a backslash and the letter after it is not a t, n, ", or \ then throw exception
-            //if there is a backslash and those characters do follow, then include those characters in the string
-            // but don't include the backslash
-            //check to make sure that there is a colon
-            //throw an exception if there is no colon
-            //check to see if there is another open bracket
-            //if so, associate that object wgith the key
-            //recurse
-            //if not, associate that string as the value with the key
-         }
-       }
+    	valIndex += 1;
+      
+	   // Check it is a bracket.
+		while (true) 
+		{
+		   valIndex = condenseWhiteSpace(in, valIndex);
+		   if (in.charAt(valIndex) == '}')
+		   {
+		   	break;
+		   }
              
-   }    
-  
-   return new MyJSON();
-  }
+		   int stringEnd = parseString(in, valIndex);
+         // Increment by 1 to skip the " character.
+         String key = in.substring(valIndex + 1, stringEnd);
+		   	
+         // The next character after the ending " could be whitespace. 
+		   valIndex = condenseWhiteSpace( in, stringEnd + 1);
+		   	
+		   // check for colon.
+		   if(in.charAt(valIndex) != ':')
+		   {
+		   	throw new IOException("There is no colon after the key");
+		   }
+            
+         // There could be whitespace after the colin.
+		   valIndex = condenseWhiteSpace( in, valIndex + 1 );
+
+		   if (in.charAt(valIndex) == '"')
+		   {
+		   	int valEnd = parseString(in, valIndex);
+		   	String value = in.substring(valIndex + 1, valEnd);
+               
+		   	store.setString(key, value);
+		   	valIndex = condenseWhiteSpace( in, valEnd + 1);
+               
+		   	if (in.charAt(valIndex) != ',' && in.charAt(valIndex) != '}')
+            {
+		   	 	throw new IOException("Missing comma or closing bracket");
+            }
+            // If not this we know that it has to be a '}' character. 
+            // However, to cut down on code that is already taken care of later.
+            if (in.charAt(valIndex) == ',')
+            {
+               valIndex += 1;
+            }
+		   }
+		   else if (in.charAt(valIndex) == '{')
+		   {
+            MyJSON value = parseHelper(in);
+		   	store.setObject(key, value);
+            
+		   	valIndex = condenseWhiteSpace( in, valIndex + 1);
+            
+                        
+            if (in.charAt(valIndex) != ',' && in.charAt(valIndex) != '}')
+            {
+		   	 	throw new IOException("Missing comma or closing bracket");
+            }
+            // If not this we know that it has to be a '}' character. 
+            // However, to cut down on code that is already taken care of later.
+            if (in.charAt(valIndex) == ',')
+            {
+               valIndex += 1;
+            }
+		   }
+		   else
+		   {
+		   	throw new IOException("Nothing");
+		   }
+
+		   valIndex = condenseWhiteSpace(in, valIndex);
+		   if (in.charAt(valIndex) == '}')
+		   {
+		   	break;
+		   }
+	   }
+
+   	return store;
+	}
+
+	@Override
+	public JSON parse(String in) throws IOException 
+	{
+		valIndex = 0;
+	  	return parseHelper(in);  
+	}
+
+	private static int condenseWhiteSpace(String s, int index)
+	{
+	  	while(index < s.length() && s.charAt(index) == ' ')
+	  	{
+	  		index += 1;
+	  	}
+	  	//this is the start of the new string
+	  	return index;
+	}
+
+	private static int parseString(String s, int index) throws IOException
+	{
+	   	if(s.charAt(index) != '"')
+	   	{
+	        throw new IOException("Missing quotation");
+	   	}
+	         
+	    index += 1;
+	   	while(index < s.length() && s.charAt(index) != '"')
+	   	{
+		   	if(s.charAt(index) == '\\')
+		   	{
+	            if (index + 1 >= s.length())
+	            {
+	                throw new IOException("Exceeded string length");
+	            }
+		   		if(s.charAt( index + 1 ) !=  't' || s.charAt( index + 1 ) != 'n' || 
+	                s.charAt( index + 1 ) != '"' || s.charAt( index + 1 ) != '\\')
+		   		{
+		   			throw new IOException("Not a valid escape character");
+		   		}
+		   	}
+	   		index += 1;
+	   	}
+	         
+	    if (s.charAt(index) != '"')
+	    {
+	        throw new IOException("Missing closing quotation mark");
+	    }
+	   	return index;
+	}
 }

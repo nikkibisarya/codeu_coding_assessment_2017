@@ -65,7 +65,59 @@ final class TestMain {
         Asserts.isEqual("doe", nameObj.getString("last"));
       }
     });
+   
+    tests.add("Object Withing An Object Value", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
 
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{ \"name\":{\"first\":{\"sam\":\"dewey\"}, \"last\":\"doe\" } }");
+
+        final JSON nameObj = obj.getObject("name");
+
+       Asserts.isNotNull(nameObj);
+       Asserts.isEqual("dewey", nameObj.getString("sam"));
+       Asserts.isEqual("doe", nameObj.getString("last"));
+
+      }
+    });
+   
+   tests.add("Object Withing An Object Value", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{ \"name\":{\"first\":{\"sam\":\"dewey\"}, \"last\":\"doe\" } }");
+
+        final JSON nameObj = obj.getObject("name");
+
+       Asserts.isNotNull(nameObj);
+       final JSON secondNameObj = nameObj.getObject("first");
+       Asserts.isEqual("dewey", secondNameObj.getString("sam"));
+       Asserts.isEqual("doe", nameObj.getString("last"));
+
+
+      }
+    });
+   
+    tests.add("Many Objects Value", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{    \"name\":{\"first\":{ \"sam\":{\"dewey\":\"deweyVal\"}    }, \"last\":\"doe\" } }");
+
+        final JSON nameObj = obj.getObject("name");
+
+       Asserts.isNotNull(nameObj);
+       final JSON secondNameObj = nameObj.getObject("first");
+       final JSON thirdNameObj = secondNameObj.getObject("sam");
+       Asserts.isEqual("doe", nameObj.getString("last"));
+       Asserts.isEqual("deweyVal", thirdNameObj.getString("dewey"));
+
+      }
+    });
+   
     tests.run(new JSONFactory(){
       @Override
       public JSONParser parser() {
