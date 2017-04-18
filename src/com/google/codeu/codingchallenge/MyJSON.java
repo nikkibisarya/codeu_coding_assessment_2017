@@ -48,7 +48,8 @@ final class MyJSON implements JSON {
   @Override
   public void getObjects(Collection<String> names) {
     // TODO: implement this
-    for (String key : objDict.keySet()) {
+    for (String key : objDict.keySet())
+    {
         names.add(key);
     }
     
@@ -57,7 +58,8 @@ final class MyJSON implements JSON {
   @Override
   public void getStrings(Collection<String> names) {
     // TODO: implement this
-    for (String key : strDict.keySet()) {
+    for (String key : strDict.keySet())
+    {
         names.add(key);
     }
   }

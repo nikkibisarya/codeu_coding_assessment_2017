@@ -22,42 +22,39 @@ final class TestMain {
   public static void main(String[] args) {
 
     final Tester tests = new Tester();
-
     tests.add("Empty Object", new Test() {
       @Override
-      public void run(JSONFactory factory) throws Exception {
-        final JSONParser parser = factory.parser();
-        final JSON obj = parser.parse("{ }");
+     public void run(JSONFactory factory) throws Exception {
+       final JSONParser parser = factory.parser();
+       final JSON obj = parser.parse("{ }");
 
-        final Collection<String> strings = new HashSet<>();
-        obj.getStrings(strings);
+       final Collection<String> strings = new HashSet<>();
+       obj.getStrings(strings);
 
-        Asserts.isEqual(strings.size(), 0);
+       Asserts.isEqual(strings.size(), 0);
 
-        final Collection<String> objects = new HashSet<>();
-        obj.getObjects(objects);
+       final Collection<String> objects = new HashSet<>();
+       obj.getObjects(objects);
 
-        Asserts.isEqual(objects.size(), 0);
-      }
+       Asserts.isEqual(objects.size(), 0);
+     }
     });
 
     tests.add("String Value", new Test() {
       @Override
-      public void run(JSONFactory factory) throws Exception {
-        final JSONParser parser = factory.parser();
-        final JSON obj = parser.parse("{ \"name\":\"sam doe\" }");
+     public void run(JSONFactory factory) throws Exception {
+       final JSONParser parser = factory.parser();
+       final JSON obj = parser.parse("{ \"name\":\"sam doe\" }");
 
-        Asserts.isEqual("sam doe", obj.getString("name"));
+       Asserts.isEqual("sam doe", obj.getString("name"));
      }
     });
 
     tests.add("Object Value", new Test() {
       @Override
       public void run(JSONFactory factory) throws Exception {
-
         final JSONParser parser = factory.parser();
         final JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\" } }");
-
         final JSON nameObj = obj.getObject("name");
 
         Asserts.isNotNull(nameObj);
@@ -73,13 +70,12 @@ final class TestMain {
 
         final JSONParser parser = factory.parser();
         final JSON obj = parser.parse("{ \"name\":{\"first\":{\"sam\":\"dewey\"}, \"last\":\"doe\" } }");
-
         final JSON nameObj = obj.getObject("name");
+        final JSON secondNameObj = nameObj.getObject("first");
 
-       Asserts.isNotNull(nameObj);
-       final JSON secondNameObj = nameObj.getObject("first");
-       Asserts.isEqual("dewey", secondNameObj.getString("sam"));
-       Asserts.isEqual("doe", nameObj.getString("last"));
+        Asserts.isNotNull(nameObj);
+        Asserts.isEqual("dewey", secondNameObj.getString("sam"));
+        Asserts.isEqual("doe", nameObj.getString("last"));
 
 
       }
@@ -91,14 +87,13 @@ final class TestMain {
 
         final JSONParser parser = factory.parser();
         final JSON obj = parser.parse("{    \"name\":{\"first\":{ \"sam\":{\"dewey\":\"deweyVal\"}    }, \"last\":\"doe\" } }");
-
         final JSON nameObj = obj.getObject("name");
 
-       Asserts.isNotNull(nameObj);
-       final JSON secondNameObj = nameObj.getObject("first");
-       final JSON thirdNameObj = secondNameObj.getObject("sam");
-       Asserts.isEqual("doe", nameObj.getString("last"));
-       Asserts.isEqual("deweyVal", thirdNameObj.getString("dewey"));
+        Asserts.isNotNull(nameObj);
+        final JSON secondNameObj = nameObj.getObject("first");
+        final JSON thirdNameObj = secondNameObj.getObject("sam");
+        Asserts.isEqual("doe", nameObj.getString("last"));
+        Asserts.isEqual("deweyVal", thirdNameObj.getString("dewey"));
 
       }
     });

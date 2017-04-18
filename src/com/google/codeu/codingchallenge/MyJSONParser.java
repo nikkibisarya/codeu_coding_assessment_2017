@@ -138,35 +138,35 @@ final class MyJSONParser implements JSONParser
 
 	private static int parseString(String s, int index) throws IOException
 	{
-	   	if(s.charAt(index) != '"')
-	   	{
-	        throw new IOException("Missing quotation");
-	   	}
+	   if(s.charAt(index) != '"')
+	   {
+	      throw new IOException("Missing quotation");
+	   }
 	         
-	    index += 1;
-	   	while(index < s.length() && s.charAt(index) != '"')
-	   	{
-		   	if(s.charAt(index) == '\\')
-		   	{
-               //ensure string length is valid, else throw an exception
-	            if (index + 1 >= s.length())
-	            {
-	                throw new IOException("Exceeded string length");
-	            }
+	   index += 1;
+	   while(index < s.length() && s.charAt(index) != '"')
+	   {
+		  	if(s.charAt(index) == '\\')
+		  	{
+              //ensure string length is valid, else throw an exception
+	           if (index + 1 >= s.length())
+	           {
+	               throw new IOException("Exceeded string length");
+	           }
                //check validity of escape character, otherwise throw an exception
-		   		if(s.charAt( index + 1 ) !=  't' || s.charAt( index + 1 ) != 'n' || 
+		   	  if(s.charAt( index + 1 ) !=  't' || s.charAt( index + 1 ) != 'n' || 
 	                s.charAt( index + 1 ) != '"' || s.charAt( index + 1 ) != '\\')
-		   		{
+		   	  {
 		   			throw new IOException("Not a valid escape character");
-		   		}
-		   	}
-	   		index += 1;
-	   	}
+		   	  }
+		   }
+	   	index += 1;
+	   }
 	    //ensure that the string is properly closed
-	    if (s.charAt(index) != '"')
-	    {
-	        throw new IOException("Missing closing quotation mark");
-	    }
-	   	return index;
+	   if (s.charAt(index) != '"')
+	   {
+	      throw new IOException("Missing closing quotation mark");
+	   }
+	   return index;
 	}
 }
