@@ -62,6 +62,6 @@ final class MyJSON implements JSON {
     }
   }
 
-  Map<String, String> strDict = new HashMap<String, String>(); //make private?
+  Map<String, String> strDict = new HashMap<String, String>();
   Map<String, JSON> objDict = new HashMap<String, JSON>();
 }

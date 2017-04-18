@@ -21,6 +21,7 @@ final class MyJSONParser implements JSONParser
 	private int valIndex = 0;
 	private MyJSON parseHelper(String in) throws IOException
 	{
+      //check to see if string exists
       if (in.length() == 0)
       {
         	throw new IOException("Invalid string");
@@ -29,7 +30,7 @@ final class MyJSONParser implements JSONParser
 		MyJSON store = new MyJSON();
 
 		valIndex = condenseWhiteSpace(in, valIndex);
-           
+      // Check it is a bracket.
    	if(in.charAt(valIndex) != '{')
    	{
    		throw new IOException("Next one is " + in.charAt(valIndex) + " not { at index " + valIndex);
@@ -37,10 +38,11 @@ final class MyJSONParser implements JSONParser
       
     	valIndex += 1;
       
-	   // Check it is a bracket.
+	   
 		while (true) 
 		{
 		   valIndex = condenseWhiteSpace(in, valIndex);
+         //if there is a closing bracket, end of parse
 		   if (in.charAt(valIndex) == '}')
 		   {
 		   	break;
@@ -59,7 +61,7 @@ final class MyJSONParser implements JSONParser
 		   	throw new IOException("There is no colon after the key");
 		   }
             
-         // There could be whitespace after the colin.
+         // There could be whitespace after the colon.
 		   valIndex = condenseWhiteSpace( in, valIndex + 1 );
 
 		   if (in.charAt(valIndex) == '"')
@@ -83,9 +85,10 @@ final class MyJSONParser implements JSONParser
 		   }
 		   else if (in.charAt(valIndex) == '{')
 		   {
+            //recursively call this function in case there are multiple dictionaries
             MyJSON value = parseHelper(in);
 		   	store.setObject(key, value);
-            
+            //There could be excess whitespace after the opening bracket--look for comma or closing bracket
 		   	valIndex = condenseWhiteSpace( in, valIndex + 1);
             
                         
@@ -93,7 +96,7 @@ final class MyJSONParser implements JSONParser
             {
 		   	 	throw new IOException("Missing comma or closing bracket");
             }
-            // If not this we know that it has to be a '}' character. 
+            // If not this, we know that it has to be a '}' character. 
             // However, to cut down on code that is already taken care of later.
             if (in.charAt(valIndex) == ',')
             {
@@ -102,9 +105,9 @@ final class MyJSONParser implements JSONParser
 		   }
 		   else
 		   {
-		   	throw new IOException("Nothing");
+		   	throw new IOException("Empty");
 		   }
-
+         //make sure the dictionary is properly closed
 		   valIndex = condenseWhiteSpace(in, valIndex);
 		   if (in.charAt(valIndex) == '}')
 		   {
@@ -118,6 +121,7 @@ final class MyJSONParser implements JSONParser
 	@Override
 	public JSON parse(String in) throws IOException 
 	{
+      //pass in current index and recurse using the helper function
 		valIndex = 0;
 	  	return parseHelper(in);  
 	}
@@ -144,10 +148,12 @@ final class MyJSONParser implements JSONParser
 	   	{
 		   	if(s.charAt(index) == '\\')
 		   	{
+               //ensure string length is valid, else throw an exception
 	            if (index + 1 >= s.length())
 	            {
 	                throw new IOException("Exceeded string length");
 	            }
+               //check validity of escape character, otherwise throw an exception
 		   		if(s.charAt( index + 1 ) !=  't' || s.charAt( index + 1 ) != 'n' || 
 	                s.charAt( index + 1 ) != '"' || s.charAt( index + 1 ) != '\\')
 		   		{
@@ -156,7 +162,7 @@ final class MyJSONParser implements JSONParser
 		   	}
 	   		index += 1;
 	   	}
-	         
+	    //ensure that the string is properly closed
 	    if (s.charAt(index) != '"')
 	    {
 	        throw new IOException("Missing closing quotation mark");
